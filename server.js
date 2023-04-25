@@ -15,7 +15,7 @@ mongoose.connect("mongodb+srv://vijayvr:123vijayvr@cluster1.zt8bq.mongodb.net/ic
 
 
 app.get('/', async(req, res) => {
-    res.send('You are Home');
+    res.send('<h4> Welcome ICT React Site - Backend</h4>');
     console.log('console home');
 });
 
