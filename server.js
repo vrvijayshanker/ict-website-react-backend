@@ -19,6 +19,13 @@ app.get('/', async(req, res) => {
     console.log('console home');
 });
 
+//Admin Login
+const Admin = require('./models/Admin.js')
+
+app.get('/alladmin', async(req, res) => {
+    const admin = await Admin.find();
+    res.json(admin);
+});
 
 // CRUD Staff ----------------------------------------
 const Staff = require('./models/Staff')
@@ -88,6 +95,7 @@ app.delete('/deletestaff/:id', async(req,res) => {
     const result = await Staff.findByIdAndDelete(req.params.id);
     res.json(result);
 });
+
 
 //Start Server -------------------------------
 app.listen(5000, () => { 
