@@ -20,12 +20,56 @@ app.get('/', async(req, res) => {
 });
 
 //Admin Login
-const Admin = require('./models/Admin.js')
+const Admin = require('./models/Admin')
 
 app.get('/alladmin', async(req, res) => {
     const admin = await Admin.find();
     res.json(admin);
 });
+
+// CRUD Course ----------------------------------------
+const Course = require('./models/Course')
+
+//Get All Courses 
+app.get('/allcourse', async(req, res) => {
+    const course = await Course.find();
+    res.json(course);
+});
+
+//Add Course
+app.post('/addcourse', (req,res) => {
+    const addcourse = new Course({
+        coursetitle: req.body.coursetitle,
+        coursetype: req.body.coursetype,
+        overview: req.body.overview,
+        thumbImage: req.body.thumbImage,
+        syllabusfile: req.body.syllabusfile,
+        description: req.body.description,
+        duration: req.body.duration,
+        internship: req.body.internship,
+        fee: req.body.fee,
+        cmode: req.body.cmode,
+        startdate: req.body.startdate,
+        enddate: req.body.enddate,
+        cstatus: req.body.cstatus
+    });
+
+    addcourse.save();
+
+    res.json(addcourse);
+    res.status(201).json(addcourse);
+    console.log(addcourse);    
+});
+
+
+//Delete Course (Tested using POSTMAN)
+app.delete('/deletecourse/:id', async(req,res) => {
+    const result = await Course.findByIdAndDelete(req.params.id);
+    res.json(result);
+});
+
+
+// END CRUD Course ----------------------------------------
 
 // CRUD Staff ----------------------------------------
 const Staff = require('./models/Staff')
