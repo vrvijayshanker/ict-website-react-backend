@@ -62,6 +62,30 @@ app.post('/addcourse', (req,res) => {
     console.log(addcourse);    
 });
 
+//get a Staff by ID (Tested using POSTMAN)
+app.get('/getcourse/:id', async(req, res) => {
+    const course = await Course.findById(req.params.id)
+    res.json(course);
+});
+
+//Update Course
+app.patch("/updatecourse/:_id", async (req, res) => {
+    let id = req.params._id;
+    let updatedData = req.body;
+    let options = {new: true};
+
+    try{
+        const newdata = await Course.findByIdAndUpdate(id,updatedData, options);
+        res.send(updatedData);
+
+    }
+    catch (error) {
+        res.send(error.message);
+    }
+
+})
+
+
 
 //Delete Course (Tested using POSTMAN)
 app.delete('/deletecourse/:id', async(req,res) => {
