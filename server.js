@@ -1,6 +1,7 @@
-const express = require ('express')
-const mongoose = require ('mongoose')
+const express = require ('express');
+const mongoose = require ('mongoose');
 const cors = require('cors');
+const multer = require('multer');
 
 const app = express()
 
@@ -74,27 +75,63 @@ app.delete('/deletecourse/:id', async(req,res) => {
 // CRUD Staff ----------------------------------------
 const Staff = require('./models/Staff')
 
+//Setting up Multer
+const imageStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './uploads/')
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now()+"_"+file.originalname)
+    }
+});
+const imageUpload = multer({ 
+    storage: imageStorage,
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
+});
+
+//To see the image from folder 'uploads'
+app.use('/uploads', express.static('./uploads'))
+
 //Get All Staff (Tested using POSTMAN)
 app.get('/allstaff', async(req, res) => {
     const staff = await Staff.find();
     res.json(staff);
 });
 
+
+
 //Add staff (Tested using POSTMAN)
-app.post('/addstaff', (req,res) => {
-    const addstaff = new Staff({
-        staffname: req.body.staffname,
-        photo: req.body.photo,
-        designation: req.body.designation,
-        department: req.body.department
-    });
+app.post('/addstaff', imageUpload.single('photo'), async (req,res) => {
 
-    addstaff.save();
+        console.log("You are here at add staff post")
 
-    res.json(addstaff);
-    res.status(201).json(addstaff);
-    console.log(addstaff);    
+        let photo = (req.file) ? req.file.filename : null;
+    
+        const addstaff = new Staff({
+            staffname: req.body.staffname,
+            photo,
+            designation: req.body.designation,
+            department: req.body.department
+        });
+        try {
+            const savedStaff = await addstaff.save();  
+            // res.json(savedStaff)           
+            res.status(201).json(savedStaff);            
+            console.log(savedStaff);
+
+
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Failed to save staff member.' });
+          } 
+        // addstaff.save();
+
+        // // res.json(addstaff)
+        // res.status(201).json(addstaff);
+        // console.log(addstaff); 
+      
 });
+
 
 //Select a Staff based on Designation (Tested using POSTMAN)
 app.get('/staffbydesignation/:designation', (req, res) => {
@@ -121,6 +158,8 @@ app.get('/getstaff/:id', async(req, res) => {
 app.patch("/updatestaff/:_id", async (req, res) => {
     let id = req.params._id;
     let updatedData = req.body;
+    // let updatedPhoto = (req.file) ? req.file.filename : null;
+    console.log(updatedData)
     let options = {new: true};
 
     try{
