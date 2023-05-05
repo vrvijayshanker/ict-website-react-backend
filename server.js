@@ -9,9 +9,9 @@ app.use(express.json());
 app.use(cors());
 
 //Setting up Multer
-const imageStorage = multer.diskStorage({
+let imageStorage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, './uploads/')
+        cb(null, './uploads/staffprofile')
     },
     filename: function(req, file, cb) {
         cb(null, Date.now()+"_"+file.originalname)
@@ -30,7 +30,7 @@ const thumbStorage = multer.diskStorage({
         cb(null, Date.now()+"_"+file.originalname)
     }
 });
-const thumbUpload = multer({ 
+let thumbUpload = multer({ 
     storage: thumbStorage,
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
 });
@@ -43,7 +43,7 @@ const testimonialStorage = multer.diskStorage({
         cb(null, Date.now()+"_"+file.originalname)
     }
 });
-const testimonialUpload = multer({ 
+let testimonialUpload = multer({ 
     storage: testimonialStorage,
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
 });
@@ -109,7 +109,9 @@ app.post('/addcourse', thumbUpload.single('thumbImage'), async(req,res) => {
           } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Failed to save staff member.' });
-          } 
+          } finally {
+            thumbUpload = null
+          }
    
 
     // addcourse.save();
@@ -160,6 +162,8 @@ const Staff = require('./models/Staff')
 
 //To see the image from folder 'uploads'
 app.use('/uploads/coursethumb', express.static('./uploads/coursethumb'))
+//To see the image from folder 'uploads'
+app.use('/uploads/staffprofile', express.static('./uploads/staffprofile'))
 
 //Get All Staff (Tested using POSTMAN)
 app.get('/allstaff', async(req, res) => {
@@ -269,7 +273,7 @@ app.post('/addtestimonial', testimonialUpload.single('student_photo'), async (re
 
         let student_photo = (req.file) ? req.file.filename : null;
     
-        const addtestimonial = new Testimonial({
+        let addtestimonial = new Testimonial({
             testimonial: req.body.testimonial,
             student_photo,
             student_name: req.body.student_name,
@@ -286,7 +290,9 @@ app.post('/addtestimonial', testimonialUpload.single('student_photo'), async (re
           } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Failed to save testimonial.' });
-          } 
+          } finally {            
+            testimonialUpload = null;
+          }
         
 });
 
