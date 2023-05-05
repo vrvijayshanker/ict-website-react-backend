@@ -8,6 +8,46 @@ const app = express()
 app.use(express.json());
 app.use(cors());
 
+//Setting up Multer
+const imageStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './uploads/')
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now()+"_"+file.originalname)
+    }
+});
+const imageUpload = multer({ 
+    storage: imageStorage,
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
+});
+
+const thumbStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './uploads/coursethumb')
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now()+"_"+file.originalname)
+    }
+});
+const thumbUpload = multer({ 
+    storage: thumbStorage,
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
+});
+
+const testimonialStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './uploads/testimonialphoto')
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now()+"_"+file.originalname)
+    }
+});
+const testimonialUpload = multer({ 
+    storage: testimonialStorage,
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
+});
+
 mongoose.connect("mongodb+srv://vijayvr:123vijayvr@cluster1.zt8bq.mongodb.net/ictdb", {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -38,28 +78,45 @@ app.get('/allcourse', async(req, res) => {
 });
 
 //Add Course
-app.post('/addcourse', (req,res) => {
-    const addcourse = new Course({
-        coursetitle: req.body.coursetitle,
-        coursetype: req.body.coursetype,
-        overview: req.body.overview,
-        thumbImage: req.body.thumbImage,
-        syllabusfile: req.body.syllabusfile,
-        description: req.body.description,
-        duration: req.body.duration,
-        internship: req.body.internship,
-        fee: req.body.fee,
-        cmode: req.body.cmode,
-        startdate: req.body.startdate,
-        enddate: req.body.enddate,
-        cstatus: req.body.cstatus
-    });
+app.post('/addcourse', thumbUpload.single('thumbImage'), async(req,res) => {
 
-    addcourse.save();
+    console.log("You are here at add Course post")
 
-    res.json(addcourse);
-    res.status(201).json(addcourse);
-    console.log(addcourse);    
+        let thumbImage = (req.file) ? req.file.filename : null;
+    
+        const addcourse = new Course({
+            coursetitle: req.body.coursetitle,
+            coursetype: req.body.coursetype,
+            overview: req.body.overview,
+            thumbImage,
+            syllabusfile: req.body.syllabusfile,
+            description: req.body.description,
+            duration: req.body.duration,
+            internship: req.body.internship,
+            fee: req.body.fee,
+            cmode: req.body.cmode,
+            startdate: req.body.startdate,
+            enddate: req.body.enddate,
+            cstatus: req.body.cstatus
+        });
+        try {
+            const savedCourse = await addcourse.save();  
+            // res.json(savedStaff)           
+            res.status(201).json(savedCourse);            
+            console.log(savedCourse);
+
+
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Failed to save staff member.' });
+          } 
+   
+
+    // addcourse.save();
+
+    // res.json(addcourse);
+    // res.status(201).json(addcourse);
+    // console.log(addcourse);    
 });
 
 //get a Staff by ID (Tested using POSTMAN)
@@ -99,22 +156,10 @@ app.delete('/deletecourse/:id', async(req,res) => {
 // CRUD Staff ----------------------------------------
 const Staff = require('./models/Staff')
 
-//Setting up Multer
-const imageStorage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, './uploads/')
-    },
-    filename: function(req, file, cb) {
-        cb(null, Date.now()+"_"+file.originalname)
-    }
-});
-const imageUpload = multer({ 
-    storage: imageStorage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
-});
+
 
 //To see the image from folder 'uploads'
-app.use('/uploads', express.static('./uploads'))
+app.use('/uploads/coursethumb', express.static('./uploads/coursethumb'))
 
 //Get All Staff (Tested using POSTMAN)
 app.get('/allstaff', async(req, res) => {
@@ -199,6 +244,75 @@ app.patch("/updatestaff/:_id", async (req, res) => {
 
 //Delete Staff (Tested using POSTMAN)
 app.delete('/deletestaff/:id', async(req,res) => {
+    const result = await Staff.findByIdAndDelete(req.params.id);
+    res.json(result);
+});
+
+// CRUD Testimonial ----------------------------------------
+const Testimonial = require('./models/Testimonial')
+
+//To see the image from folder 'uploads'
+app.use('/uploads/testimonialphoto', express.static('./uploads/testimonialphoto'))
+
+//Get All Testimonial
+app.get('/alltestimonial', async(req, res) => {
+    const testimonial = await Testimonial.find();
+    res.json(testimonial);
+});
+
+
+
+//Add Testimonial
+app.post('/addtestimonial', testimonialUpload.single('student_photo'), async (req,res) => {
+
+        console.log("You are here at testimonial")
+
+        let student_photo = (req.file) ? req.file.filename : null;
+    
+        const addtestimonial = new Testimonial({
+            testimonial: req.body.testimonial,
+            student_photo,
+            student_name: req.body.student_name,
+            course: req.body.course,
+            batch: req.body.batch
+        });
+        try {
+            const savedTestimonial = await addtestimonial.save();  
+            // res.json(savedTestimonial)           
+            res.status(201).json(savedTestimonial);            
+            console.log(savedTestimonial);
+
+
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Failed to save testimonial.' });
+          } 
+        
+});
+
+
+
+//Update Testimonial
+app.patch("/updatetestimonial/:_id", async (req, res) => {
+    let id = req.params._id;
+    let updatedData = req.body;
+    // let updatedPhoto = (req.file) ? req.file.filename : null;
+    console.log(updatedData)
+    let options = {new: true};
+
+    try{
+        const newdata = await Staff.findByIdAndUpdate(id,updatedData, options);
+        res.send(updatedData);
+
+    }
+    catch (error) {
+        res.send(error.message);
+    }
+
+})
+
+//Delete Testimonial
+app.delete('/deletetestimonial/:id', async(req,res) => {
     const result = await Staff.findByIdAndDelete(req.params.id);
     res.json(result);
 });

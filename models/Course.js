@@ -18,10 +18,6 @@ const CourseSchema = new Schema({
         type: String,
         required: true
     },
-    syllabusfile:{
-        type: String,
-        required: true
-    },
     description: {
         type: String,
         required: true
