@@ -7,7 +7,7 @@ const StaffSchema = new Schema({
         required: true
     },
     photo: {
-        type: String,
+        type: String
         
     },
     designation: {
