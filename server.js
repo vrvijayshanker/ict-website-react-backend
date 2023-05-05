@@ -269,7 +269,7 @@ app.get('/alltestimonial', async(req, res) => {
 //Add Testimonial
 app.post('/addtestimonial', testimonialUpload.single('student_photo'), async (req,res) => {
 
-        console.log("You are here at testimonial")
+        console.log("You are here at testimonial");
 
         let student_photo = (req.file) ? req.file.filename : null;
     
