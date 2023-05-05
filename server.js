@@ -145,6 +145,18 @@ app.patch("/updatecourse/:_id", async (req, res) => {
 })
 
 
+//Select a course based on type 
+app.get('/coursebytype/:coursetype', (req, res) => {
+    const coursetype = req.params.coursetype;
+    Course.find({ coursetype: coursetype }).lean().exec()
+      .then((courses) => {
+        res.send(courses);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send('Error occurred while retrieving Course type');
+      });
+  });
 
 //Delete Course (Tested using POSTMAN)
 app.delete('/deletecourse/:id', async(req,res) => {
