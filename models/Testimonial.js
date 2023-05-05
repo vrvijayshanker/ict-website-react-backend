@@ -13,7 +13,7 @@ const TestimonialSchema = new Schema({
     student_photo: {
         type: String
     },
-    course: {
+    student_course: {
         type: String,
         required: true
     },

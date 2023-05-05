@@ -119,7 +119,7 @@ app.post('/addcourse', thumbUpload.single('thumbImage'), async(req,res) => {
     // console.log(addcourse);    
 });
 
-//get a Staff by ID (Tested using POSTMAN)
+//get a Course by ID (Tested using POSTMAN)
 app.get('/getcourse/:id', async(req, res) => {
     const course = await Course.findById(req.params.id)
     res.json(course);
@@ -273,7 +273,7 @@ app.post('/addtestimonial', testimonialUpload.single('student_photo'), async (re
             testimonial: req.body.testimonial,
             student_photo,
             student_name: req.body.student_name,
-            course: req.body.course,
+            student_course: req.body.student_course,
             batch: req.body.batch
         });
         try {
@@ -290,10 +290,15 @@ app.post('/addtestimonial', testimonialUpload.single('student_photo'), async (re
         
 });
 
-
+//get a Testimonial by ID (Tested using POSTMAN)
+app.get('/gettestimonial/:id', async(req, res) => {
+    const singledata = await Testimonial.findById(req.params.id)
+    res.json(singledata);
+});
 
 //Update Testimonial
 app.patch("/updatetestimonial/:_id", async (req, res) => {
+    console.log("inside edit test")
     let id = req.params._id;
     let updatedData = req.body;
     // let updatedPhoto = (req.file) ? req.file.filename : null;
@@ -301,7 +306,7 @@ app.patch("/updatetestimonial/:_id", async (req, res) => {
     let options = {new: true};
 
     try{
-        const newdata = await Staff.findByIdAndUpdate(id,updatedData, options);
+        const newdata = await Testimonial.findByIdAndUpdate(id,updatedData, options);
         res.send(updatedData);
 
     }
@@ -313,7 +318,8 @@ app.patch("/updatetestimonial/:_id", async (req, res) => {
 
 //Delete Testimonial
 app.delete('/deletetestimonial/:id', async(req,res) => {
-    const result = await Staff.findByIdAndDelete(req.params.id);
+    // console.log(req.params.id)
+    const result = await Testimonial.findByIdAndDelete(req.params.id);
     res.json(result);
 });
 
