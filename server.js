@@ -341,6 +341,38 @@ app.delete('/deletetestimonial/:id', async(req,res) => {
     res.json(result);
 });
 
+//SUBSCRIBER EMAIL GET AND POST
+
+const SubEmail = require('./models/Subemail')
+
+//Retrieve Email
+app.get('/allsubemail', async(req, res) => {
+    const subemail = await SubEmail.find();
+    res.json(subemail);
+});
+
+//Save email
+app.post('/addsubemail', async (req, res) => {
+    try {
+      const existingSubemail = await SubEmail.findOne({ email: req.body.email });
+      if (existingSubemail) {
+        res.status(400).json({ message: 'Email already exists.' });
+      } else {
+        const addsubemail = new SubEmail({
+          user: req.body.user,
+          email: req.body.email
+        });
+        const savedSubmail = await addsubemail.save();
+        res.status(201).json(savedSubmail);
+        console.log(savedSubmail);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Failed to save Email.' });
+    }
+  });
+  
+
 
 //Start Server -------------------------------
 app.listen(5000, () => { 
