@@ -9,46 +9,46 @@ app.use(express.json());
 app.use(cors());
 
 //Setting up Multer
-let imageStorage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, './uploads/staffprofile')
-    },
-    filename: function(req, file, cb) {
-        cb(null, Date.now()+"_"+file.originalname)
-    }
-});
-//Creating Instance for multer
-const imageUpload = multer({ 
-    storage: imageStorage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
+// let imageStorage = multer.diskStorage({
+//     destination: function(req, file, cb) {
+//         cb(null, './uploads/staffprofile')
+//     },
+//     filename: function(req, file, cb) {
+//         cb(null, Date.now()+"_"+file.originalname)
+//     }
+// });
+// Creating Instance for multer
+// const imageUpload = multer({ 
+//     storage: imageStorage,
+//     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
   
-});
+// });
 
-const thumbStorage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, './uploads/coursethumb')
-    },
-    filename: function(req, file, cb) {
-        cb(null, Date.now()+"_"+file.originalname)
-    }
-});
-let thumbUpload = multer({ 
-    storage: thumbStorage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
-});
+// const thumbStorage = multer.diskStorage({
+//     destination: function(req, file, cb) {
+//         cb(null, './uploads/coursethumb')
+//     },
+//     filename: function(req, file, cb) {
+//         cb(null, Date.now()+"_"+file.originalname)
+//     }
+// });
+// let thumbUpload = multer({ 
+//     storage: thumbStorage,
+//     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
+// });
 
-const testimonialStorage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, './uploads/testimonialphoto')
-    },
-    filename: function(req, file, cb) {
-        cb(null, Date.now()+"_"+file.originalname)
-    }
-});
-let testimonialUpload = multer({ 
-    storage: testimonialStorage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
-});
+// const testimonialStorage = multer.diskStorage({
+//     destination: function(req, file, cb) {
+//         cb(null, './uploads/testimonialphoto')
+//     },
+//     filename: function(req, file, cb) {
+//         cb(null, Date.now()+"_"+file.originalname)
+//     }
+// });
+// let testimonialUpload = multer({ 
+//     storage: testimonialStorage,
+//     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+// });
 
 mongoose.connect("mongodb+srv://vijayvr:123vijayvr@cluster1.zt8bq.mongodb.net/ictdb", {
     useNewUrlParser: true,
@@ -80,18 +80,17 @@ app.get('/allcourse', async(req, res) => {
 });
 
 //Add Course
-app.post('/addcourse', thumbUpload.single('thumbImage'), async(req,res) => {
+app.post('/addcourse', async(req,res) => {
 
-    console.log("You are here at add Course post")
+    // console.log("You are here at add Course post")
 
-        let thumbImage = (req.file) ? req.file.filename : null;
+        // let thumbImage = (req.file) ? req.file.filename : null;
     
         const addcourse = new Course({
             coursetitle: req.body.coursetitle,
             coursetype: req.body.coursetype,
             overview: req.body.overview,
-            thumbImage,
-            syllabusfile: req.body.syllabusfile,
+            thumbImage: req.body.thumbImage,
             description: req.body.description,
             duration: req.body.duration,
             internship: req.body.internship,
@@ -103,17 +102,16 @@ app.post('/addcourse', thumbUpload.single('thumbImage'), async(req,res) => {
         });
         try {
             const savedCourse = await addcourse.save();  
-            // res.json(savedStaff)           
+            // res.json(savedCourse)           
             res.status(201).json(savedCourse);            
-            console.log(savedCourse);
+            console.log("Course Saved");
 
 
           } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Failed to save Course.' });
-          } finally {
-            thumbUpload = null
-          }
+
+          } 
    
 
     // addcourse.save();
@@ -136,7 +134,7 @@ app.patch("/updatecourse/:_id", async (req, res) => {
     let options = {new: true};
 
     try{
-        const newdata = await Course.findByIdAndUpdate(id,updatedData, options);
+        const newdata = await Course.findByIdAndUpdate(id, updatedData, options);
         res.send(updatedData);
 
     }
@@ -188,15 +186,15 @@ app.get('/allstaff', async(req, res) => {
 
 
 //Add staff (Tested using POSTMAN)
-app.post('/addstaff', imageUpload.single('photo'), async (req,res) => {
+app.post('/addstaff',  async (req,res) => {
 
-        console.log("You are here at add staff post")
+        // console.log("You are here at add staff post")
 
-        let photo = (req.file) ? req.file.filename : null;
+        // let photo = (req.file) ? req.file.filename : null;
     
         const addstaff = new Staff({
             staffname: req.body.staffname,
-            photo,
+            photo: req.body.photo,
             designation: req.body.designation,
             department: req.body.department
         });
@@ -204,7 +202,7 @@ app.post('/addstaff', imageUpload.single('photo'), async (req,res) => {
             const savedStaff = await addstaff.save();  
             // res.json(savedStaff)           
             res.status(201).json(savedStaff);            
-            console.log(savedStaff);
+            console.log("Staff Saved");
 
 
           } catch (error) {
@@ -242,7 +240,7 @@ app.patch("/updatestaff/:_id", async (req, res) => {
     let id = req.params._id;
     let updatedData = req.body;
     // let updatedPhoto = (req.file) ? req.file.filename : null;
-    console.log(updatedData)
+    console.log("Course Updated")
     let options = {new: true};
 
     try{
@@ -277,15 +275,15 @@ app.get('/alltestimonial', async(req, res) => {
 
 
 //Add Testimonial
-app.post('/addtestimonial', testimonialUpload.single('student_photo'), async (req,res) => {
+app.post('/addtestimonial', async (req,res) => {
 
-        console.log("You are here at testimonial");
+        // console.log("You are here at testimonial");
 
-        let student_photo = (req.file) ? req.file.filename : null;
+        // let student_photo = (req.file) ? req.file.filename : null;
     
         let addtestimonial = new Testimonial({
             testimonial: req.body.testimonial,
-            student_photo,
+            student_photo: req.body.student_photo,
             student_name: req.body.student_name,
             student_course: req.body.student_course,
             batch: req.body.batch
@@ -294,14 +292,12 @@ app.post('/addtestimonial', testimonialUpload.single('student_photo'), async (re
             const savedTestimonial = await addtestimonial.save();  
             // res.json(savedTestimonial)           
             res.status(201).json(savedTestimonial);            
-            console.log(savedTestimonial);
+            // console.log(savedTestimonial);
 
 
           } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Failed to save testimonial.' });
-          } finally {            
-            testimonialUpload = null;
           }
         
 });
@@ -314,11 +310,11 @@ app.get('/gettestimonial/:id', async(req, res) => {
 
 //Update Testimonial
 app.patch("/updatetestimonial/:_id", async (req, res) => {
-    console.log("inside edit test")
+    // console.log("inside edit testimonial")
     let id = req.params._id;
     let updatedData = req.body;
     // let updatedPhoto = (req.file) ? req.file.filename : null;
-    console.log(updatedData)
+    // console.log(updatedData)
     let options = {new: true};
 
     try{
@@ -362,7 +358,7 @@ app.post('/addsubemail', async (req, res) => {
         });
         const savedSubmail = await addsubemail.save();
         res.status(201).json(savedSubmail);
-        console.log(savedSubmail);
+        // console.log(savedSubmail);
       }
     } catch (error) {
       console.error(error);
