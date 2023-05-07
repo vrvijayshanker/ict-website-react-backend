@@ -17,9 +17,11 @@ let imageStorage = multer.diskStorage({
         cb(null, Date.now()+"_"+file.originalname)
     }
 });
+//Creating Instance for multer
 const imageUpload = multer({ 
     storage: imageStorage,
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
+  
 });
 
 const thumbStorage = multer.diskStorage({
@@ -45,7 +47,7 @@ const testimonialStorage = multer.diskStorage({
 });
 let testimonialUpload = multer({ 
     storage: testimonialStorage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit 
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
 mongoose.connect("mongodb+srv://vijayvr:123vijayvr@cluster1.zt8bq.mongodb.net/ictdb", {
@@ -108,7 +110,7 @@ app.post('/addcourse', thumbUpload.single('thumbImage'), async(req,res) => {
 
           } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Failed to save staff member.' });
+            res.status(500).json({ message: 'Failed to save Course.' });
           } finally {
             thumbUpload = null
           }
@@ -207,13 +209,9 @@ app.post('/addstaff', imageUpload.single('photo'), async (req,res) => {
 
           } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Failed to save staff member.' });
+            return res.status(400).json({ error: 'Invalid file format. Only .png and .jpg files are allowed.' });
+            // res.status(500).json({ message: 'Failed to save staff member.' });
           } 
-        // addstaff.save();
-
-        // // res.json(addstaff)
-        // res.status(201).json(addstaff);
-        // console.log(addstaff); 
       
 });
 
@@ -370,7 +368,16 @@ app.post('/addsubemail', async (req, res) => {
       console.error(error);
       res.status(500).json({ message: 'Failed to save Email.' });
     }
-  });
+});
+
+app.delete('/deletesubemail/:id', async(req,res) => {
+    // console.log(req.params.id)
+    const result = await SubEmail.findByIdAndDelete(req.params.id);
+    res.json(result);
+});
+
+
+
   
 
 
